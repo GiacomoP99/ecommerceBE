@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.aizoon.productproject.dto.ProductRequestDTO;
 import com.aizoon.productproject.dto.ProductResponseDTO;
 import com.aizoon.productproject.exceptions.ResourceNotFoundException;
-import com.aizoon.productproject.model.Category;
 import com.aizoon.productproject.model.Product;
 import com.aizoon.productproject.repository.ProductRepository;
 
@@ -36,9 +35,10 @@ public class ProductService {
 				.collect(Collectors.toList());
 	}
 
-	public ProductResponseDTO updateProduct(ProductRequestDTO prod, Long pId) {
+	public ProductResponseDTO updateProduct(ProductRequestDTO prod, Long pId) throws ResourceNotFoundException {
 		Product ent = mapDtoToEntity(prod);
 		ent.setId(pId);
+		ent.setCategory(cserv.getCategoryById(prod.getCategory()));
 		repo.save(ent);
 		ProductResponseDTO dto = mapEntityToDto(ent);
 		return dto;
@@ -46,10 +46,8 @@ public class ProductService {
 	}
 
 	public ProductResponseDTO saveProduct(ProductRequestDTO prod) throws ResourceNotFoundException {
-		Long idC = prod.getCategory();
-		Category C = cserv.getCategoryById(idC);
 		Product ent = mapDtoToEntity(prod);
-		ent.setCategory(C);
+		ent.setCategory(cserv.getCategoryById(prod.getCategory()));
 		repo.save(ent);
 		ProductResponseDTO dto = mapEntityToDto(ent);
 		return dto;
